@@ -1,7 +1,14 @@
+// Name: Marvin Dale
+// ID  : 18362583
+
 // Driver for Employee hierarchy
 
 // Java core packages
-import java.text.DecimalFormat;
+import org.joda.money.Money;
+
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 // Java extension packages
 import javax.swing.JOptionPane;
@@ -10,60 +17,65 @@ public class Test {
 
     // test Employee hierarchy
     public static void main(String args[]) {
-        Employee employee; // superclass reference
+        //Employee employee; // superclass reference
         String output = "";
+        ArrayList<Employee> employees = new ArrayList<>();
 
-        Boss boss = new Boss("John", "Smith", 800.0);
+        //workers instantiated with their weekly earnings
+
+        Boss boss = new Boss("John", "Smith", Money.parse("EUR 800"),
+                LocalDate.of(2000, 1, 3));
 
         CommissionWorker commissionWorker =
                 new CommissionWorker(
-                "Sue", "Jones", 400.0, 3.0, 150);
+                "Sue", "Jones", LocalDate.of(2017, 1, 13),
+                        Money.parse("EUR 400"), Money.parse("EUR 3.0"), 150);
 
         PieceWorker pieceWorker =
-                new PieceWorker("Bob", "Lewis", 2.5, 200);
+                new PieceWorker("Bob", "Lewis", LocalDate.of(2020, 4, 15),
+                        Money.parse("EUR 2.5"), 200);
 
         HourlyWorker hourlyWorker =
-                new HourlyWorker("Karen", "Price", 13.75, 40);
+                new HourlyWorker("Karen", "Price", LocalDate.of(2016, 9, 1),
+                        Money.parse("EUR 13.75"), 40);
 
-        DecimalFormat precision2 = new DecimalFormat("0.00");
+        //add workers to arraylist
+        employees.add(boss);
+        employees.add(commissionWorker);
+        employees.add(pieceWorker);
+        employees.add(hourlyWorker);
 
-// Employee reference to a Boss
-        employee = boss;
-
-        output += employee.toString() + " earned $"
-                + precision2.format(employee.earnings()) + "\n"
-                + boss.toString() + " earned $"
-                + precision2.format(boss.earnings()) + "\n";
-
-        // Employee reference to a CommissionWorker
-        employee = commissionWorker;
-
-        output += employee.toString() + " earned $"
-                + precision2.format(employee.earnings()) + "\n"
-                + commissionWorker.toString() + " earned $"
-                + precision2.format(
-                commissionWorker.earnings()) + "\n";
-
-        // Employee reference to a PieceWorker
-        employee = pieceWorker;
-
-        output += employee.toString() + " earned $"
-                + precision2.format(employee.earnings()) + "\n"
-                + pieceWorker.toString() + " earned $"
-                + precision2.format(pieceWorker.earnings()) + "\n";
-
-// Employee reference to an HourlyWorker
-        employee = hourlyWorker;
-
-        output += employee.toString() + " earned $"
-                + precision2.format(employee.earnings()) + "\n"
-                + hourlyWorker.toString() + " earned $"
-                + precision2.format(hourlyWorker.earnings()) + "\n";
+        output += handlePayroll(employees);
 
         JOptionPane.showMessageDialog(null, output,
-                "Demonstrating Polymorphism",
+                "Monthly Staff Payroll",
                 JOptionPane.INFORMATION_MESSAGE);
 
         System.exit(0);
     }
+
+    public static String handlePayroll(ArrayList<Employee> employees) {
+        String output = "";
+        int thisYear = LocalDate.now().getYear();
+
+        Money bonus;
+        for (Employee emp: employees) {
+            if (thisYear - emp.getJoinDate().getYear() > 5) {
+                bonus = Money.parse("EUR 200");
+            }
+            else {
+                bonus = Money.parse("EUR 0");
+            }
+
+            try {
+                output += emp.toString() + " " + emp.earnings().multipliedBy(
+                        4, RoundingMode.FLOOR).plus(bonus) + "\n";
+            } catch (LowWageException exception) {
+                output += exception.getMessage();
+                exception.printStackTrace();
+            }
+        }
+        return output;
+    }
+
 } // end class Test
