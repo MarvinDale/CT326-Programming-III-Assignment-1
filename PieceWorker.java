@@ -11,7 +11,8 @@ import java.time.LocalDate;
 public final class PieceWorker extends Employee {
 
     private Money wagePerPiece; // wage per piece output
-    private int quantity; // output for week
+    private int   quantity;     // output for week
+    private int   idNum;        // unique id number
 
     // constructor for class PieceWorker
     public PieceWorker(String first, String last, LocalDate date,
@@ -23,7 +24,7 @@ public final class PieceWorker extends Employee {
 
     // set PieceWorker's wage
     public void setWage(Money wage) {
-        Money zero = Money.parse("EUR 0");
+        Money zero   = Money.parse("EUR 0");
         wagePerPiece = (wage.isGreaterThan(zero) ? wage : zero);
     }
 
@@ -35,20 +36,16 @@ public final class PieceWorker extends Employee {
     // determine PieceWorker's earnings
     public Money earnings () throws LowWageException {
         Money totalEarnings = wagePerPiece.multipliedBy(quantity);
-        Money min = Money.parse("EUR 100");
-
-        System.out.println(totalEarnings + "piece worker total");
+        Money min           = Money.parse("EUR 100"); // set limit to throw exception
 
         //throw exception if the total earnings are below EUR 100
         if (totalEarnings.isLessThan(min)){
             throw new LowWageException(getFirstName() + " " + getLastName()
                     +" is earning " + totalEarnings + " a week" + "\n"
-                    + "Each employee must earn at least " + min + " a week");
+                    + "Each employee must earn at least " + min + " a week \n");
         }
-
         return totalEarnings;
     }
-
     public String toString() {
         return "Piece worker: " + super.toString();
     }

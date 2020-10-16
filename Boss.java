@@ -4,12 +4,12 @@
 // Boss class derived from Employee.
 
 import org.joda.money.Money;
-
 import java.time.LocalDate;
 
 public final class Boss extends Employee {
 
     private Money weeklySalary;
+    private int   idNum; // unique id number
 
     // constructor for class Boss
     public Boss(String first, String last, Money salary, LocalDate date) {
@@ -19,12 +19,21 @@ public final class Boss extends Employee {
 
     // set Boss's salary
     public void setWeeklySalary(Money salary) {
-        Money zero = Money.parse("EUR 0");
+        Money zero   = Money.parse("EUR 0");
         weeklySalary = (salary.isGreaterThan(zero) ? salary : zero);
     }
 
     // get Boss's pay
-    public Money earnings() {
+    public Money earnings() throws LowWageException {
+        // set limit to throw exception
+        Money min = Money.parse("EUR 100");
+
+        if (weeklySalary.isLessThan(min)) {
+            throw new LowWageException(getFirstName() + " " + getLastName()
+                    +" is earning " + weeklySalary + " a week" + "\n"
+                    + "Each employee must earn at least " + min + " a week \n");
+        }
+
         return weeklySalary;
     }
 

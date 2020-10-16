@@ -5,13 +5,13 @@
 
 
 import org.joda.money.Money;
-
 import java.time.LocalDate;
 
 public final class HourlyWorker extends Employee {
 
-    private Money wage; // wage per hour
+    private Money  wage;  // wage per hour
     private double hours; // hours worked for week
+    private int    idNum; // unique id number
 
     // constructor for class HourlyWorker
     public HourlyWorker(String first, String last, LocalDate date,
@@ -34,12 +34,18 @@ public final class HourlyWorker extends Employee {
     }
 
     // Get the HourlyWorker's pay
-    public Money earnings() {
+    public Money earnings() throws LowWageException {
+        Money totalEarnings = wage.multipliedBy((long) hours);
+        Money min           = Money.parse("EUR 100"); // set limit to throw exception
 
-
-        return wage.multipliedBy((long) hours);
+        //throw exception if the total earnings are below EUR 100
+        if (totalEarnings.isLessThan(min)) {
+            throw new LowWageException(getFirstName() + " " + getLastName()
+                    +" is earning " + totalEarnings + " a week" + "\n"
+                    + "Each employee must earn at least " + min + " a week \n");
+        }
+        return totalEarnings;
     }
-
     public String toString() {
         return "Hourly worker: " + super.toString();
     }
